@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hunfalvy Randomizáló • Tanórai sorsoló</title>
+<style>
+:root{
+  --bg:#07111f;--panel:#0d1b2fdd;--panel2:#102440;--text:#f4f8ff;--muted:#a9bdd8;
+  --cyan:#31e6ff;--violet:#9b7cff;--pink:#ff5fb7;--green:#58f3a2;--danger:#ff718a;
+  --line:#24466d;--shadow:0 24px 70px #0008;--r:24px;
+}
+*{box-sizing:border-box} html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:var(--bg)}
+body{min-height:100vh;overflow-x:hidden;background:
+radial-gradient(circle at 15% 15%,#143b66 0,transparent 31%),
+radial-gradient(circle at 85% 12%,#3b1762 0,transparent 28%),
+radial-gradient(circle at 50% 90%,#083f4b 0,transparent 35%),#07111f}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.18;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:34px 34px}
+button,input,textarea{font:inherit}
+button{border:0;cursor:pointer}
+.app{width:min(1500px,96vw);margin:auto;padding:22px 0 40px;position:relative}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900;font-size:clamp(22px,2vw,32px);letter-spacing:.3px}
+.logo{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,var(--cyan),var(--violet));box-shadow:0 0 28px #31e6ff55;color:#06101c}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.iconbtn,.back{color:var(--text);background:#0c1a2dbd;border:1px solid var(--line);border-radius:14px;padding:11px 15px;font-weight:800;box-shadow:0 8px 30px #0003}
+.iconbtn:hover,.back:hover{border-color:var(--cyan)}
+.screen{display:none}.screen.active{display:block;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.hero{text-align:center;padding:4vh 10px 2vh}
+.kicker{color:var(--cyan);font-weight:900;letter-spacing:.18em;text-transform:uppercase;font-size:13px}
+h1{font-size:clamp(38px,6vw,78px);line-height:.98;margin:14px auto 18px;max-width:1000px;letter-spacing:-.04em}
+.gradient{background:linear-gradient(90deg,var(--cyan),#fff,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.subtitle{color:var(--muted);font-size:clamp(17px,1.7vw,24px);max-width:850px;margin:auto;line-height:1.5}
+.menu{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:34px auto;max-width:1300px}
+.card{min-height:255px;text-align:left;padding:28px;border-radius:var(--r);color:var(--text);background:linear-gradient(145deg,#112844e8,#0b1729e8);border:1px solid #31577d;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:.2s}
+.card:after{content:"";position:absolute;width:170px;height:170px;border-radius:50%;right:-70px;top:-70px;background:var(--glow);filter:blur(8px);opacity:.18}
+.card:hover{transform:translateY(-5px);border-color:var(--accent);box-shadow:0 20px 70px #0009,0 0 28px color-mix(in srgb,var(--accent) 30%,transparent)}
+.card .num{font-size:13px;color:var(--accent);font-weight:1000;letter-spacing:.14em}.card h2{font-size:clamp(25px,2.2vw,36px);margin:20px 0 10px}.card p{color:#bfd0e6;font-size:17px;line-height:1.5;margin:0}.card .go{position:absolute;bottom:22px;right:24px;font-size:30px;color:var(--accent)}
+.sectionHead{display:flex;align-items:end;justify-content:space-between;gap:20px;margin:12px 0 18px}
+.sectionHead h2{font-size:clamp(30px,4vw,54px);margin:0}.sectionHead p{margin:6px 0 0;color:var(--muted);font-size:17px}
+.panel{background:#0b192bdd;border:1px solid #27496e;border-radius:var(--r);box-shadow:var(--shadow);padding:22px;backdrop-filter:blur(12px)}
+.two{display:grid;grid-template-columns:minmax(300px,.8fr) minmax(430px,1.2fr);gap:20px}
+label{display:block;font-weight:900;margin:0 0 9px;color:#dceaff}
+textarea,input[type=number]{width:100%;background:#06111f;color:#fff;border:1px solid #31577d;border-radius:16px;padding:14px 16px;outline:none;transition:.2s}
+textarea{min-height:270px;resize:vertical;font-size:17px;line-height:1.45}
+textarea:focus,input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #31e6ff18}
+.help{color:var(--muted);font-size:14px;margin:8px 0 0}
+.primary{background:linear-gradient(100deg,var(--cyan),#7f8cff);color:#04101b;border-radius:16px;padding:14px 20px;font-weight:1000;font-size:18px;box-shadow:0 10px 28px #31e6ff28}
+.primary:hover{filter:brightness(1.08)} .primary:disabled{opacity:.5;cursor:not-allowed}
+.secondary{background:#10243c;color:#e9f4ff;border:1px solid #31577d;border-radius:16px;padding:13px 18px;font-weight:900}
+.controls{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin-top:16px}.field{min-width:180px;flex:1}.controls .primary{flex:1;min-width:220px}
+.wheelWrap{display:grid;place-items:center;min-height:510px;position:relative}
+.wheelStage{position:relative;width:min(62vw,480px);aspect-ratio:1}
+#wheel{width:100%;height:100%;filter:drop-shadow(0 0 26px #31e6ff28)}
+.pointer{position:absolute;z-index:4;right:-5px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:20px solid transparent;border-bottom:20px solid transparent;border-left:0;border-right:38px solid #fff;filter:drop-shadow(0 0 8px #fff)}
+.wheelCenter{position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);width:78px;height:78px;border-radius:50%;background:#07111f;border:6px solid white;box-shadow:0 0 20px #fff8;display:grid;place-items:center;font-weight:1000}
+.resultBanner{min-height:92px;margin-top:12px;border:1px solid #31577d;border-radius:20px;background:#091727;padding:16px;display:grid;place-items:center;text-align:center;color:var(--muted);font-size:18px}
+.resultBanner strong{font-size:clamp(29px,4vw,50px);color:#fff;text-shadow:0 0 20px #31e6ff88}
+.gradeGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.gradeGrid textarea{min-height:250px}.gradeTitle{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.badge{border-radius:999px;padding:5px 10px;font-weight:1000;font-size:13px;background:#163153;color:#dff7ff}
+.groupControls{display:flex;gap:14px;align-items:end;flex-wrap:wrap;margin-top:18px}.groupControls .field{max-width:260px}.groupControls .primary{min-width:260px}
+.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px;margin-top:20px}
+.group{background:linear-gradient(145deg,#102742,#091625);border:1px solid #31577d;border-radius:22px;padding:20px;min-height:150px;opacity:0;transform:translateY(18px) scale(.97);animation:pop .45s ease forwards;box-shadow:0 14px 38px #0004}
+@keyframes pop{to{opacity:1;transform:none}}
+.group h3{margin:0 0 14px;color:var(--cyan);font-size:23px}.member{font-size:clamp(20px,2vw,28px);font-weight:850;padding:8px 0;border-top:1px solid #ffffff12;display:flex;justify-content:space-between;gap:10px}.member:first-of-type{border-top:0}.yr{font-size:12px;border-radius:999px;padding:5px 8px;background:#1a3556;color:#cfe7ff;white-space:nowrap;align-self:center}
+.shuffleOverlay{position:fixed;inset:0;z-index:30;background:#06101cea;backdrop-filter:blur(8px);display:none;place-items:center;text-align:center}.shuffleOverlay.show{display:grid}
+.shuffleBox{font-size:clamp(30px,5vw,68px);font-weight:1000}.shuffleBox span{display:block;color:var(--cyan);font-size:.35em;letter-spacing:.2em;margin-bottom:12px}.dots{margin-top:24px}.dots i{display:inline-block;width:14px;height:14px;border-radius:50%;margin:6px;background:#fff;animation:bounce .7s infinite alternate}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes bounce{to{transform:translateY(-16px);background:var(--cyan);box-shadow:0 0 18px var(--cyan)}}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(120px);z-index:50;background:#20101a;border:1px solid #8c3654;color:#ffe8ef;border-radius:16px;padding:14px 20px;font-weight:850;transition:.3s;box-shadow:var(--shadow)}.toast.show{transform:translateX(-50%)}
+.footer{text-align:center;color:#6f89a9;font-size:13px;margin-top:26px}
+@media(max-width:950px){.menu{grid-template-columns:1fr}.card{min-height:200px}.two{grid-template-columns:1fr}.gradeGrid{grid-template-columns:1fr 1fr}.wheelWrap{min-height:420px}.wheelStage{width:min(82vw,430px)}}
+@media(max-width:600px){.app{width:94vw}.topbar{align-items:flex-start}.brand span:last-child{display:none}.gradeGrid{grid-template-columns:1fr}.sectionHead{align-items:flex-start;flex-direction:column}.panel{padding:16px}.wheelWrap{min-height:340px}.member{font-size:21px}}
+.creatorCredit{
+  text-align:center;
+  margin:34px 0 8px;
+  color:#ff5fb7;
+  font-weight:900;
+  font-size:16px;
+  letter-spacing:.03em;
+  text-shadow:0 0 14px #ff5fb766;
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="logo">✦</div><span>Hunfalvy Randomizáló</span></div>
+    <div class="actions">
+      <button class="back" id="homeBtn" onclick="showScreen('home')" style="display:none">← Főmenü</button>
+      <button class="iconbtn" id="soundBtn" onclick="toggleSound()" title="Hang be/ki">🔊 Hang</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="home" class="screen active">
+      <div class="hero">
+        <div class="kicker">TANÓRAI RANDOM SORSOLÓ</div>
+        <h1><span class="gradient">Hunfalvy Randomizáló</span></h1>
+        <p class="subtitle">Névsorsolás és gyors, kiegyensúlyozott csoportalakítás.</p>
+      </div>
+      <div class="menu">
+        <button class="card" style="--accent:#31e6ff;--glow:#31e6ff" onclick="showScreen('picker')">
+          <div class="num">01 • SZERENCSEKERÉK</div><h2>🎡 Névsorsoló</h2><p>Másold be a neveket, pörgesd meg a kereket, és a választást hang + animáció kíséri.</p><div class="go">→</div>
+        </button>
+        <button class="card" style="--accent:#9b7cff;--glow:#9b7cff" onclick="showScreen('mixed')">
+          <div class="num">02 • ÉVFOLYAMMIX</div><h2>🧩 Vegyes évfolyamok</h2><p>9–12. évfolyam külön listákból, lehetőség szerint minél vegyesebb csoportokba rendezve.</p><div class="go">→</div>
+        </button>
+        <button class="card" style="--accent:#ff5fb7;--glow:#ff5fb7" onclick="showScreen('free')">
+          <div class="num">03 • CSOPORTGENERÁTOR</div><h2>⚡ Szabad csoportalakítás</h2><p>Egyetlen névlistából 2–8 fős, véletlenszerű és kiegyensúlyozott csoportok.</p><div class="go">→</div>
+        </button>
+      </div>
+      
+    </section>
+
+    <section id="picker" class="screen">
+      <div class="sectionHead"><div><h2>🎡 Névsorsoló</h2><p>Egy név soronként. Az üres sorokat és ismétlődéseket figyelmen kívül hagyjuk.</p></div></div>
+      <div class="two">
+        <div class="panel">
+          <label for="pickerNames">Névlista</label>
+          <textarea id="pickerNames" placeholder="Anna&#10;Bence&#10;Csenge&#10;Dávid&#10;Emese&#10;Fanni" oninput="drawWheel()"></textarea>
+          <div class="help"><span id="pickerCount">0</span> név a keréken</div>
+          <div class="controls">
+            <button class="secondary" onclick="clearPicker()">🗑 Lista törlése</button>
+            <button class="secondary" onclick="shufflePickerNames()">↻ Lista keverése</button>
+            <button class="secondary" onclick="clearPickerNames()">🗑 Lista törlése</button>
+            <button class="primary" id="spinBtn" onclick="spinWheel()">KERÉK PÖRGETÉSE ✦</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="wheelWrap">
+            <div class="wheelStage">
+              <canvas id="wheel" width="700" height="700"></canvas>
+              <div class="pointer"></div><div class="wheelCenter">✦</div>
+            </div>
+          </div>
+          <div class="resultBanner" id="pickerResult">A sorsolás eredménye itt jelenik meg.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="mixed" class="screen">
+      <div class="sectionHead"><div><h2>🧩 Vegyes évfolyamos csoportok</h2><p>A rendszer először összekeveri az évfolyamokat, majd körkörösen osztja őket a csoportokba.</p></div></div>
+      <div class="panel">
+        <div class="gradeGrid">
+          <div><div class="gradeTitle"><label>9. évfolyam</label><span class="badge" id="c9">0 fő</span></div><textarea id="g9" placeholder="9.-es nevek..."></textarea></div>
+          <div><div class="gradeTitle"><label>10. évfolyam</label><span class="badge" id="c10">0 fő</span></div><textarea id="g10" placeholder="10.-es nevek..."></textarea></div>
+          <div><div class="gradeTitle"><label>11. évfolyam</label><span class="badge" id="c11">0 fő</span></div><textarea id="g11" placeholder="11.-es nevek..."></textarea></div>
+          <div><div class="gradeTitle"><label>12. évfolyam</label><span class="badge" id="c12">0 fő</span></div><textarea id="g12" placeholder="12.-es nevek..."></textarea></div>
+        </div>
+        <div class="groupControls">
+          <div class="field"><label for="mixedSize">Kívánt csoportméret</label><input id="mixedSize" type="number" min="2" max="12" value="4"></div>
+          <button class="secondary" onclick="clearMixed()">🗑 Összes lista törlése</button>
+          <button class="primary" onclick="makeMixed()">CSOPORTOK KISORSOLÁSA ✦</button>
+        </div>
+      </div>
+      <div class="results" id="mixedResults"></div>
+    </section>
+
+    <section id="free" class="screen">
+      <div class="sectionHead"><div><h2>⚡ Szabad csoportalakítás</h2><p>2–8 fős csoportok. A maradék automatikusan szétoszlik, hogy ne maradjon külön „maradékcsoport”.</p></div></div>
+      <div class="two">
+        <div class="panel">
+          <label for="freeNames">Névlista</label>
+          <textarea id="freeNames" placeholder="Anna&#10;Bence&#10;Csenge&#10;Dávid&#10;Emese..."></textarea>
+          <div class="controls">
+            <div class="field"><label for="freeSize">Kívánt csoportméret (2–8)</label><input id="freeSize" type="number" min="2" max="8" value="4"></div>
+            <button class="secondary" onclick="clearFree()">🗑 Lista törlése</button>
+            <button class="primary" onclick="makeFree()">CSOPORTOK KISORSOLÁSA ✦</button>
+          </div>
+          <p class="help">Példa: 18 fő + 4-es méret → 4 csoport → 5–5–4–4 fő.</p>
+        </div>
+        <div class="panel">
+          <div id="freeSummary" class="resultBanner">A csoportok itt jelennek meg.</div>
+          <div class="results" id="freeResults"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+<div class="creatorCredit">Készítette: Cseh Zsuzsanna</div>
+</div>
+
+<div class="shuffleOverlay" id="overlay"><div class="shuffleBox"><span>RANDOMIZER</span><div id="overlayText">Keverem a neveket…</div><div class="dots"><i></i><i></i><i></i></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+let soundOn=true, audioCtx=null, wheelRotation=0, spinning=false, lastWinner=null;
+const $=id=>document.getElementById(id);
+const palette=['#31e6ff','#9b7cff','#ff5fb7','#58f3a2','#ffd166','#4ca6ff','#e879f9','#2dd4bf','#fb7185','#a3e635','#f59e0b','#818cf8'];
+
+function namesFrom(id){
+  const raw=$(id).value.split(/\n|,/).map(x=>x.trim()).filter(Boolean);
+  return [...new Set(raw)];
+}
+function shuffle(a){
+  a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a;
+}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active'); $('homeBtn').style.display=id==='home'?'none':'inline-block';
+  window.scrollTo({top:0,behavior:'smooth'}); if(id==='picker')setTimeout(drawWheel,30);
+}
+function clearPicker(){
+  $('pickerNames').value=''; $('pickerResult').innerHTML='A sorsolás eredménye itt jelenik meg.';
+  wheelRotation=0; drawWheel(); beep(180,.06,.02,'triangle');
+}
+function clearMixed(){
+  [9,10,11,12].forEach(g=>{ $('g'+g).value=''; $('c'+g).textContent='0 fő'; });
+  $('mixedResults').innerHTML=''; beep(180,.06,.02,'triangle');
+}
+function clearFree(){
+  $('freeNames').value=''; $('freeResults').innerHTML='';
+  $('freeSummary').innerHTML='A csoportok itt jelennek meg.'; beep(180,.06,.02,'triangle');
+}
+function toggleSound(){soundOn=!soundOn;$('soundBtn').textContent=(soundOn?'🔊':'🔇')+' Hang'; if(soundOn) beep(440,.05,.03)}
+function ctx(){if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)(); return audioCtx}
+function beep(freq=440,dur=.08,vol=.035,type='sine',delay=0){
+  if(!soundOn)return; const c=ctx(),o=c.createOscillator(),g=c.createGain(),t=c.currentTime+delay;
+  o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur+.03);
+}
+function successSound(){[523,659,784,1047].forEach((f,i)=>beep(f,.16,.045,'sine',i*.09))}
+function groupSound(){beep(220,.09,.025,'triangle');beep(330,.09,.025,'triangle',.08);beep(440,.13,.03,'triangle',.16)}
+
+function drawWheel(){
+ const canvas=$('wheel'),c=canvas.getContext('2d'),names=namesFrom('pickerNames'),n=Math.max(names.length,1),cx=350,cy=350,r=320;
+ $('pickerCount').textContent=names.length;c.clearRect(0,0,700,700);c.save();c.translate(cx,cy);c.rotate(wheelRotation);
+ if(!names.length){c.beginPath();c.arc(0,0,r,0,Math.PI*2);c.fillStyle='#10243c';c.fill();c.strokeStyle='#31e6ff';c.lineWidth=5;c.stroke();c.fillStyle='#a9bdd8';c.font='700 28px system-ui';c.textAlign='center';c.fillText('Adj meg neveket',0,-120);c.restore();return}
+ const arc=Math.PI*2/n;
+ names.forEach((name,i)=>{
+   const mid=i*arc, start=mid-arc/2;
+   c.beginPath();c.moveTo(0,0);c.arc(0,0,r,start,start+arc);c.closePath();c.fillStyle=palette[i%palette.length];c.globalAlpha=.92;c.fill();c.globalAlpha=1;c.strokeStyle='#07111f';c.lineWidth=3;c.stroke();
+   c.save();c.rotate(mid);
+   // A név a sugár mentén fut, kívülről befelé jól olvashatóan.
+   if(Math.cos(mid)<0){c.rotate(Math.PI);c.translate(-r*.60,0)}else{c.translate(r*.60,0)}
+   c.fillStyle='#06101c';c.textAlign='center';c.textBaseline='middle';
+   const fs=Math.max(12,Math.min(22,360/n+8));c.font=`900 ${fs}px system-ui`;
+   let t=name.length>17?name.slice(0,16)+'…':name;c.fillText(t,0,0);c.restore();
+ }); c.beginPath();c.arc(0,0,r,0,Math.PI*2);c.strokeStyle='#e8fbff';c.lineWidth=7;c.stroke();c.restore();
+}
+function shufflePickerNames(){let a=shuffle(namesFrom('pickerNames'));$('pickerNames').value=a.join('\n');lastWinner=null;$('pickerResult').textContent='A sorsolás eredménye itt jelenik meg.';drawWheel();beep(300,.08,.03)}
+function clearPickerNames(){if(spinning)return;$('pickerNames').value='';lastWinner=null;wheelRotation=0;$('pickerResult').textContent='A sorsolás eredménye itt jelenik meg.';drawWheel();beep(180,.07,.025,'triangle')}
+function removeWinner(){
+ if(!lastWinner||spinning)return;
+ const a=namesFrom('pickerNames').filter(n=>n!==lastWinner);
+ $('pickerNames').value=a.join('\n');
+ const removed=lastWinner;lastWinner=null;wheelRotation=0;drawWheel();
+ $('pickerResult').innerHTML='<div><strong style="font-size:28px">'+escapeHtml(removed)+'</strong><div style="margin-top:6px">levéve a kerékről ✓</div></div>';
+ beep(520,.08,.03,'sine');
+}
+function spinWheel(){
+ if(spinning)return; const names=namesFrom('pickerNames');if(names.length===0)return toast('Adj meg legalább egy nevet.');
+ if(names.length===1){
+   $('pickerResult').innerHTML='<div><div style="font-size:14px;letter-spacing:.15em;color:#31e6ff;font-weight:900">UTOLSÓ NÉV</div><strong>'+escapeHtml(names[0])+'</strong></div>';
+   successSound(); return;
+ }
+ spinning=true;$('spinBtn').disabled=true;$('pickerResult').innerHTML='Pörög a kerék…';
+ const winner=Math.floor(Math.random()*names.length),n=names.length,arc=Math.PI*2/n;
+ // A jobb oldali nyíl a 0 radián irányra mutat. Egész számú teljes fordulat kell, különben félkörös eltérés keletkezik.
+ const target=-(winner*arc)+Math.PI*2*8; const start=wheelRotation,diff=target-start,dur=4300,t0=performance.now();let lastTick=0;
+ function anim(t){let p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,4);wheelRotation=start+diff*e;drawWheel();
+   let tick=Math.floor(e*n*7.5);if(tick!==lastTick&&p<.92){beep(240+Math.min(500,p*450),.025,.012,'square');lastTick=tick}
+   if(p<1)requestAnimationFrame(anim);else{wheelRotation=((wheelRotation%(Math.PI*2))+Math.PI*2)%(Math.PI*2);drawWheel();lastWinner=names[winner];$('pickerResult').innerHTML='<div><div style="font-size:14px;letter-spacing:.15em;color:#31e6ff;font-weight:900">KISORSOLVA</div><strong>'+escapeHtml(lastWinner)+'</strong><div style="margin-top:12px"><button class="secondary" onclick="removeWinner()">✕ Eltávolítás a kerékről</button></div></div>';successSound();spinning=false;$('spinBtn').disabled=false}
+ }requestAnimationFrame(anim);
+}
+
+function groupSizes(n,target){
+ if(n===0)return[]; if(n<=target)return[n];
+ const count=Math.floor(n/target),base=Math.floor(n/count),rem=n%count;
+ return Array.from({length:count},(_,i)=>base+(i<rem?1:0));
+}
+function makeFree(){
+ const a=shuffle(namesFrom('freeNames')),size=Number($('freeSize').value);
+ if(size<2||size>8)return toast('A csoportméret 2 és 8 között legyen.'); if(a.length<2)return toast('Adj meg legalább 2 nevet.');
+ const sizes=groupSizes(a.length,size),groups=[];let k=0;sizes.forEach(s=>{groups.push(a.slice(k,k+s));k+=s});
+ animateGroups(()=>{renderGroups('freeResults',groups);$('freeSummary').innerHTML=`<strong>${a.length} fő → ${groups.length} csoport</strong><div>${sizes.join(' – ')} fős csoportok</div>`});
+}
+function makeMixed(){
+ const size=Number($('mixedSize').value);
+ if(size<2||size>12)return toast('Adj meg 2 és 12 közötti csoportméretet.');
+
+ const grades=[9,10,11,12].map(g=>({g,people:shuffle(namesFrom('g'+g))}));
+ const total=grades.reduce((sum,x)=>sum+x.people.length,0);
+ if(total<2)return toast('Adj meg legalább 2 nevet.');
+
+ const sizes=groupSizes(total,size);
+ const groups=sizes.map(()=>[]);
+ const remaining=[...sizes];
+ const groupCount=groups.length;
+
+ // ELSŐDLEGES SZABÁLY:
+ // Minden évfolyamból először legfeljebb 1-1 diák kerül minden csoportba.
+ // Ha egy évfolyamból kevesebben vannak, mint ahány csoport van,
+ // akkor a lehető legtöbb különböző csoport kap abból az évfolyamból.
+ grades.forEach(gr=>{
+   const firstRound=Math.min(gr.people.length,groupCount);
+   // Az első körben olyan csoportokat választunk, ahol van hely,
+   // és amelyek összességében még kevésbé telítettek.
+   let candidates=groups.map((_,i)=>i)
+     .filter(i=>remaining[i]>0)
+     .sort((a,b)=>groups[a].length-groups[b].length || Math.random()-.5);
+
+   for(let k=0;k<firstRound;k++){
+     // Újra keresünk szabad, az adott évfolyamot még nem tartalmazó csoportot.
+     let choices=groups.map((group,i)=>({
+       i,
+       hasGrade:group.some(x=>x.grade===gr.g),
+       used:group.length,
+       free:remaining[i]
+     })).filter(x=>x.free>0 && !x.hasGrade)
+       .sort((a,b)=>a.used-b.used || Math.random()-.5);
+
+     if(!choices.length) break;
+     const ix=choices[0].i;
+     groups[ix].push({name:gr.people[k],grade:gr.g});
+     remaining[ix]--;
+   }
+ });
+
+ // MÁSODIK KÖR:
+ // Csak azután kerülnek be a fennmaradó diákok, hogy az évfolyamok
+ // első körös szétterítése megtörtént.
+ grades.forEach(gr=>{
+   const alreadyPlaced=Math.min(gr.people.length,groupCount);
+   const leftovers=gr.people.slice(alreadyPlaced);
+   leftovers.forEach(person=>{
+     const choices=groups.map((group,i)=>({
+       i,
+       same:group.filter(x=>x.grade===gr.g).length,
+       used:group.length,
+       free:remaining[i]
+     })).filter(x=>x.free>0)
+       .sort((a,b)=>a.same-b.same || a.used-b.used || Math.random()-.5);
+
+     if(choices.length){
+       const ix=choices[0].i;
+       groups[ix].push({name:person,grade:gr.g});
+       remaining[ix]--;
+     }
+   });
+ });
+
+ groups.forEach(g=>{
+   const mixed=shuffle(g);
+   g.splice(0,g.length,...mixed);
+ });
+
+ animateGroups(()=>renderMixed(groups));
+}
+function renderGroups(id,groups){
+ $(id).innerHTML=groups.map((g,i)=>`<div class="group" style="animation-delay:${i*.11}s"><h3>${i+1}. csoport <span class="badge">${g.length} fő</span></h3>${g.map(n=>`<div class="member"><span>${escapeHtml(n)}</span></div>`).join('')}</div>`).join('');
+ groupSound();
+}
+function renderMixed(groups){
+ $('mixedResults').innerHTML=groups.map((g,i)=>`<div class="group" style="animation-delay:${i*.11}s"><h3>${i+1}. csoport <span class="badge">${g.length} fő</span></h3>${g.map(x=>`<div class="member"><span>${escapeHtml(x.name)}</span><span class="yr">${x.grade}. évf.</span></div>`).join('')}</div>`).join('');groupSound();
+}
+function animateGroups(done){
+ $('overlay').classList.add('show');let words=['Keverem a neveket…','Figyelek az egyensúlyra…','Alakulnak a csoportok…'],i=0;$('overlayText').textContent=words[0];beep(180,.1,.025,'triangle');
+ const timer=setInterval(()=>{$('overlayText').textContent=words[++i%words.length];beep(220+i*35,.07,.018,'triangle')},600);
+ setTimeout(()=>{clearInterval(timer);$('overlay').classList.remove('show');done();successSound()},1900);
+}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+[9,10,11,12].forEach(g=>$('g'+g).addEventListener('input',()=>{$('c'+g).textContent=namesFrom('g'+g).length+' fő'}));
+drawWheel();
+</script>
+</body>
+</html>
